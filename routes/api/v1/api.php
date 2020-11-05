@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 //Users
 
 Route::prefix('/user')->group(function(){
-    Route::post('/login', 'api\v1\LoginController@Login');
+    Route::post('/login', 'api/v1/LoginController@login');
 });
 
 
