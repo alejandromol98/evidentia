@@ -189,10 +189,10 @@ Una vez hechas las migraciones, ejecutamos el siguiente comando, que nos creará
 `php artisan passport:install`
 
 Tras esto, tenemos que modificar la clase app/User.php y añadir Laravel\Passport\HasApiTokens, de forma que quede de la siguiente manera:
-https://github.com/alejandromol98/evidentia/blob/assets/images/has%20api%20tokens.png
+[https://github.com/alejandromol98/evidentia/blob/assets/images/has%20api%20tokens.png]
 
 Lo siguiente es añadir a la clase app/Providers/AuthServiceProvider.php la llamada a Passport::routes, de forma que quede de la siguiente manera:
-https://github.com/alejandromol98/evidentia/blob/assets/images/passport%20routes.png
+[https://github.com/alejandromol98/evidentia/blob/assets/images/passport%20routes.png}
 
 Finalmente, en la clase config/auth.php cambiamos la opción de autenticación de api de "driver" a "passport", quedando de la siguiente manera:
-https://github.com/alejandromol98/evidentia/blob/assets/images/auth.png
+[https://github.com/alejandromol98/evidentia/blob/assets/images/auth.png]
