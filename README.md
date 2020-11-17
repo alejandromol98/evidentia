@@ -177,15 +177,19 @@ Laravel hace que la autenticación de APIs sea muy sencilla usando la librería 
 Los pasos para instalar dicha librería son:
 
 En primer lugar, debemos comprobar la versión de laravel que tenemos instalada en nuestro proyecto, para ello hacemos uso del comando:
+
 `php artisan --version`
 
 En nuestro caso, la versión es Laravel 7.21.0, por lo que instalamos la versión 9.0 de Passport (Si la versión de Laravel es superior, recomendamos que lea el siguiente enlace: https://github.com/laravel/passport/blob/master/UPGRADE.md). Para ello ejecutamos el siguiente comando:
+
 `composer require laravel/passport "~9.0"`
 
 Una vez instalado, ejecutamos el siguiente comando, que nos creará las tablas necesarias que la aplicación necesita para almacenar clientes y tokens de acceso:
+
 `php artisan migrate`
 
 Una vez hechas las migraciones, ejecutamos el siguiente comando, que nos creará las claves de encriptación necesarias para generar tokens de acceso seguros:
+
 `php artisan passport:install`
 
 Tras esto, tenemos que modificar la clase app/User.php y añadir Laravel\Passport\HasApiTokens, de forma que quede de la siguiente manera:
