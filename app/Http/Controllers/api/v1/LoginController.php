@@ -11,6 +11,10 @@ class LoginController extends Controller
 {
     public function login(Request $request)
     {
+        /**
+         * Para trabajar con usuarios de la instancia
+         */
+        \Instantiation::set_default_instance();
        $login = $request->validate([
             'email'=> 'required|string',
             'password'=>'required|string'
