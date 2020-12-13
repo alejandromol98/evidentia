@@ -28,10 +28,9 @@ class EvidenceController extends Controller
 
     public function view($instance,$id)
     {
-        $instance = \Instantiation::instance();
         $evidence = Evidence::find($id);
 
-        return $evidence->toJson();
+        return $evidence;
     }
 
     public function list()
@@ -194,77 +193,67 @@ class EvidenceController extends Controller
      ****************************************************************************/
 
     /**  public function edit($instance,$id)
-    {
-        $evidence = Evidence::find($id);
-        $comittees = Comittee::all();
+     * {
+     * $evidence = Evidence::find($id);
+     * $comittees = Comittee::all();
+     *
+     * return view('evidence.createandedit', ['evidence' => $evidence, 'instance' => $instance,
+     * 'comittees' => $comittees,
+     * 'edit' => true,
+     * 'route_draft' => route('evidence.draft.edit',$instance),
+     * 'route_publish' => route('evidence.publish.edit',$instance)]);
+     * }
+     * @param Request $request
+     * @return
+     */
 
-        return view('evidence.createandedit', ['evidence' => $evidence, 'instance' => $instance,
-            'comittees' => $comittees,
-            'edit' => true,
-            'route_draft' => route('evidence.draft.edit',$instance),
-            'route_publish' => route('evidence.publish.edit',$instance)]);
-    }
-    **/
-
-    public function draft_edit(Request $request)
+    public function draft_edit(Request $request,$instance,$id)
     {
-        return $this->save($request,"DRAFT");
-    }
-
-    public function publish_edit(Request $request)
-    {
-        return $this->save($request,"PENDING");
+        return $this->save($request,"DRAFT",$id);
     }
 
-    private function save($request,$status)
+    public function publish_edit(Request $request,$instance,$id)
     {
-        $instance = \Instantiation::instance();
+        return $this->save($request,"PENDING",$id);
+    }
 
+
+    private function save($request,$status,$id){
         $request->validate([
             'title' => 'required|min:5|max:255',
             'hours' => 'required|numeric|between:0.5,99.99|max:100',
             'description' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
         ]);
 
-        // evidencia desde la que hemos decidido partir
-        $evidence_previous = Evidence::find($request->_id);
+        $evidence = Evidence::find($id);
+        if($evidence->status = "DRAFT"){
 
-        // creamos la nueva evidencia a partir de la seleccionada para editar
-        $evidence_new = $this->new_evidence($request,$status);
+            $evidence->status = $status;
 
-        // evidencia cabecera en el flujo de ediciones (la última)
-        $evidence_header = $evidence_previous->find_header_evidence();
-        $evidence_header->last = false;
-        $evidence_header->save();
+        $evidence_new = $evidence->fill($request->all())->save();
 
-        // apuntamos al final del flujo de ediciones
-        $evidence_new->points_to = $evidence_header->id;
-        $evidence_new->save();
-
-        // nos traemos los archivos de la evidencia anterior y los copiamos
-        $this->copy_files($evidence_previous,$evidence_new,$request->removed_files);
-
-        // si el usuario decide meter archivos nuevos
-        if($request->hasFile('files'))
-            $this->new_files($request,$evidence_new);
-
-        return $evidence_new->toJson();
-
-
+        }
+        else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Evidence in status PENDING can not be updated'
+            ], 500);
+        }
+        return $evidence;
     }
 
     /****************************************************************************
      * REMOVE AN EVIDENCE
      ****************************************************************************/
 
-    public function remove(Request $request)
+    public function remove(Request $request,$instance,$id)
     {
-        $id = $request->_id;
         $evidence = Evidence::find($id);
-        $instance = \Instantiation::instance();
 
         // eliminamos recursivamente la evidencia y todas las versiones anteriores, incluyendo archivos
         $this->delete_evidence($evidence);
+
+
 
         return response()->json('Eliminada con éxito');;
     }
