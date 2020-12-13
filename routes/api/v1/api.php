@@ -39,11 +39,12 @@ Route::middleware(['checkuploadevidences'])->group(function () {
 
 Route::get('/evidence/view/{id}', 'api\v1\EvidenceController@view')->name('evidence.view');
 Route::post('/evidence/remove/{id}', 'api\v1\EvidenceController@remove')->name('evidence.remove');
+Route::post('/evidence/reedit/{id}', 'api\v1\EvidenceController@reedit')->name('evidence.reedit');
 Route::middleware(['checknotnull:Evidence','evidencemine'])->group(function () {
 
 
     Route::middleware(['checkuploadevidences'])->group(function () {
-        Route::post('/evidence/reedit', 'api\v1\EvidenceController@reedit')->name('evidence.reedit');
+
     });
 });
 });

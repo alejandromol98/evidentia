@@ -289,11 +289,10 @@ class EvidenceController extends Controller
      * REEDIT AN EVIDENCE
      ****************************************************************************/
 
-    public function reedit(Request $request)
+    public function reedit(Request $request,$instance,$id)
     {
-        $id = $request->_id;
+        //$id = $request->_id;
         $evidence = Evidence::find($id);
-        $instance = \Instantiation::instance();
 
         $evidence->status = "DRAFT";
 
