@@ -71,37 +71,58 @@ class UserController extends Controller
         return $user;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    /****************************************************************************
+     * EDIT AN USER
+     ****************************************************************************/
+
+    public function edit(Request $request, $instance,$id)
     {
-        //
+        return $this->save($request, $id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+
+    public function save($request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|min:5|max:255',
+            'username' => 'required|min:5|max:255',
+            'password' => 'required|min:8|max:255',
+            'email' => 'required|string',
+            'biography' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
+        ]);
+
+        $user = User::find($id);
+        if($user){
+            $user_new = $user->fill($request->all())->save();
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'User selected doesn´t exist.'
+            ],500);
+        }
+
+        return $user;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    /****************************************************************************
+     * REMOVE AN USER
+     ****************************************************************************/
+
+    public function remove(Request $request, $instance, $id)
     {
-        //
+        $user = User::find($id);
+
+        // Eliminamos todas las entradas de las entidades asociadas a usuario
+        $this->delete_user($user);
+
+        return response()->json('Se ha eliminado el usuario correctamente');
+    }
+
+    private function delete_user($user){
+
+        //$instance = \Instantiation::instance();
+
+        $user->delete();
+
     }
 }
