@@ -5,48 +5,70 @@ namespace App\Http\Controllers\api\v1\user;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
+use App\Rules\MaxCharacters;
+use App\Rules\MinCharacters;
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    /****************************************************************************
+     * LIST ALL USERS
+     ****************************************************************************/
+
     public function index()
     {
         return User::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    /****************************************************************************
+     * SHOW AN USER
+     ****************************************************************************/
+
+    public function view($instance,$id)
     {
-        //
+        $user = User::find($id);
+        return $user;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    /****************************************************************************
+     * CREATE AN USER
+     ****************************************************************************/
+
+    public function new(Request $request)
     {
-        //
+
+        // $instance = \Instantiation::instance();
+
+        $user = $this->new_user($request);
+
+        return $user->toJson();
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    private function new_user($request)
     {
-        //
+
+        $request->validate([
+            'name' => 'required|min:5|max:255',
+            'username' => 'required|min:5|max:255',
+            'password' => 'required|min:8|max:255',
+            'email' => 'required|string',
+            'biography' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
+        ]);
+
+        // creación de un nuevo usuario
+        $user = User::create([
+            'name' => $request->input('name'),
+            'surname' => $request->input('surname'),
+            'username' => $request->input('username'),
+            'password' => $request->input('password'),
+            'email' => $request->input('email'),
+            'dni' => $request->input('dni'),
+            'participation' => $request->input('participation'),
+            'biography' => $request->input('biography')
+        ]);
+
+        $user->save();
+
+        return $user;
     }
 
     /**
