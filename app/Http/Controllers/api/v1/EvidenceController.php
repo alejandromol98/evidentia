@@ -31,8 +31,7 @@ class EvidenceController extends Controller
         $instance = \Instantiation::instance();
         $evidence = Evidence::find($id);
 
-        return view('evidence.view',
-            ['instance' => $instance, 'evidence' => $evidence]);
+        return $evidence->toJson();
     }
 
     public function list()
@@ -119,28 +118,30 @@ class EvidenceController extends Controller
 
         // creación de la prueba o pruebas adjuntas
         $files = $request->file('files');
-        foreach($files as $file){
+        if($files) {
+            foreach ($files as $file) {
 
-            // almacenamos en disco la prueba
-            $path = Storage::putFileAs($instance.'/proofs/'.$user->username.'/evidence_'.$evidence->id.'', $file, $file->getClientOriginalName());
+                // almacenamos en disco la prueba
+                $path = Storage::putFileAs($instance . '/proofs/' . $user->username . '/evidence_' . $evidence->id . '', $file, $file->getClientOriginalName());
 
-            // almacenamos en la BBDD la información del archivo
-            $file_entity = File::create([
-                'name' => $file->getClientOriginalName(),
-                'type' => strtolower($file->getClientOriginalExtension()),
-                'route' => $path,
-                'size' => $file->getSize(),
-            ]);
+                // almacenamos en la BBDD la información del archivo
+                $file_entity = File::create([
+                    'name' => $file->getClientOriginalName(),
+                    'type' => strtolower($file->getClientOriginalExtension()),
+                    'route' => $path,
+                    'size' => $file->getSize(),
+                ]);
 
-            // cómputo del sello
-            $file_entity = \Stamp::compute_file($file_entity);
-            $file_entity->save();
+                // cómputo del sello
+                $file_entity = \Stamp::compute_file($file_entity);
+                $file_entity->save();
 
-            // almacenamos en la BBDD la información de la prueba de la evidencia
-            $proof = Proof::create([
-                'evidence_id' => $evidence->id,
-                'file_id' => $file_entity->id
-            ]);
+                // almacenamos en la BBDD la información de la prueba de la evidencia
+                $proof = Proof::create([
+                    'evidence_id' => $evidence->id,
+                    'file_id' => $file_entity->id
+                ]);
+            }
         }
     }
 
