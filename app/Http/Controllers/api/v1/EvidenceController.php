@@ -28,11 +28,9 @@ class EvidenceController extends Controller
 
     public function view($instance,$id)
     {
-        $instance = \Instantiation::instance();
         $evidence = Evidence::find($id);
 
-        return view('evidence.view',
-            ['instance' => $instance, 'evidence' => $evidence]);
+        return $evidence;
     }
 
     public function list()
@@ -119,28 +117,30 @@ class EvidenceController extends Controller
 
         // creación de la prueba o pruebas adjuntas
         $files = $request->file('files');
-        foreach($files as $file){
+        if($files) {
+            foreach ($files as $file) {
 
-            // almacenamos en disco la prueba
-            $path = Storage::putFileAs($instance.'/proofs/'.$user->username.'/evidence_'.$evidence->id.'', $file, $file->getClientOriginalName());
+                // almacenamos en disco la prueba
+                $path = Storage::putFileAs($instance . '/proofs/' . $user->username . '/evidence_' . $evidence->id . '', $file, $file->getClientOriginalName());
 
-            // almacenamos en la BBDD la información del archivo
-            $file_entity = File::create([
-                'name' => $file->getClientOriginalName(),
-                'type' => strtolower($file->getClientOriginalExtension()),
-                'route' => $path,
-                'size' => $file->getSize(),
-            ]);
+                // almacenamos en la BBDD la información del archivo
+                $file_entity = File::create([
+                    'name' => $file->getClientOriginalName(),
+                    'type' => strtolower($file->getClientOriginalExtension()),
+                    'route' => $path,
+                    'size' => $file->getSize(),
+                ]);
 
-            // cómputo del sello
-            $file_entity = \Stamp::compute_file($file_entity);
-            $file_entity->save();
+                // cómputo del sello
+                $file_entity = \Stamp::compute_file($file_entity);
+                $file_entity->save();
 
-            // almacenamos en la BBDD la información de la prueba de la evidencia
-            $proof = Proof::create([
-                'evidence_id' => $evidence->id,
-                'file_id' => $file_entity->id
-            ]);
+                // almacenamos en la BBDD la información de la prueba de la evidencia
+                $proof = Proof::create([
+                    'evidence_id' => $evidence->id,
+                    'file_id' => $file_entity->id
+                ]);
+            }
         }
     }
 
@@ -193,77 +193,67 @@ class EvidenceController extends Controller
      ****************************************************************************/
 
     /**  public function edit($instance,$id)
-    {
-        $evidence = Evidence::find($id);
-        $comittees = Comittee::all();
+     * {
+     * $evidence = Evidence::find($id);
+     * $comittees = Comittee::all();
+     *
+     * return view('evidence.createandedit', ['evidence' => $evidence, 'instance' => $instance,
+     * 'comittees' => $comittees,
+     * 'edit' => true,
+     * 'route_draft' => route('evidence.draft.edit',$instance),
+     * 'route_publish' => route('evidence.publish.edit',$instance)]);
+     * }
+     * @param Request $request
+     * @return
+     */
 
-        return view('evidence.createandedit', ['evidence' => $evidence, 'instance' => $instance,
-            'comittees' => $comittees,
-            'edit' => true,
-            'route_draft' => route('evidence.draft.edit',$instance),
-            'route_publish' => route('evidence.publish.edit',$instance)]);
-    }
-    **/
-
-    public function draft_edit(Request $request)
+    public function draft_edit(Request $request,$instance,$id)
     {
-        return $this->save($request,"DRAFT");
-    }
-
-    public function publish_edit(Request $request)
-    {
-        return $this->save($request,"PENDING");
+        return $this->save($request,"DRAFT",$id);
     }
 
-    private function save($request,$status)
+    public function publish_edit(Request $request,$instance,$id)
     {
-        $instance = \Instantiation::instance();
+        return $this->save($request,"PENDING",$id);
+    }
 
+
+    private function save($request,$status,$id){
         $request->validate([
             'title' => 'required|min:5|max:255',
             'hours' => 'required|numeric|between:0.5,99.99|max:100',
             'description' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
         ]);
 
-        // evidencia desde la que hemos decidido partir
-        $evidence_previous = Evidence::find($request->_id);
+        $evidence = Evidence::find($id);
+        if($evidence->status = "DRAFT"){
 
-        // creamos la nueva evidencia a partir de la seleccionada para editar
-        $evidence_new = $this->new_evidence($request,$status);
+            $evidence->status = $status;
 
-        // evidencia cabecera en el flujo de ediciones (la última)
-        $evidence_header = $evidence_previous->find_header_evidence();
-        $evidence_header->last = false;
-        $evidence_header->save();
+        $evidence_new = $evidence->fill($request->all())->save();
 
-        // apuntamos al final del flujo de ediciones
-        $evidence_new->points_to = $evidence_header->id;
-        $evidence_new->save();
-
-        // nos traemos los archivos de la evidencia anterior y los copiamos
-        $this->copy_files($evidence_previous,$evidence_new,$request->removed_files);
-
-        // si el usuario decide meter archivos nuevos
-        if($request->hasFile('files'))
-            $this->new_files($request,$evidence_new);
-
-        return $evidence_new->toJson();
-
-
+        }
+        else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Evidence in status PENDING can not be updated'
+            ], 500);
+        }
+        return $evidence;
     }
 
     /****************************************************************************
      * REMOVE AN EVIDENCE
      ****************************************************************************/
 
-    public function remove(Request $request)
+    public function remove(Request $request,$instance,$id)
     {
-        $id = $request->_id;
         $evidence = Evidence::find($id);
-        $instance = \Instantiation::instance();
 
         // eliminamos recursivamente la evidencia y todas las versiones anteriores, incluyendo archivos
         $this->delete_evidence($evidence);
+
+
 
         return response()->json('Eliminada con éxito');;
     }
@@ -299,11 +289,10 @@ class EvidenceController extends Controller
      * REEDIT AN EVIDENCE
      ****************************************************************************/
 
-    public function reedit(Request $request)
+    public function reedit(Request $request,$instance,$id)
     {
-        $id = $request->_id;
+        //$id = $request->_id;
         $evidence = Evidence::find($id);
-        $instance = \Instantiation::instance();
 
         $evidence->status = "DRAFT";
 
