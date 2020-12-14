@@ -28,24 +28,28 @@ Route::prefix('{instance}/api/v1')->group(function(){
  *  EVIDENCES
  */
 Route::group(['prefix' => '{instance}/api/v1'], function(){
-Route::get('/evidence/list', 'api\v1\EvidenceController@list')->name('evidence.list');
-Route::middleware(['checkuploadevidences'])->group(function () {
+    Route::get('/evidence/list', 'api\v1\EvidenceController@list')->name('evidence.list');
     Route::get('/evidence/create', 'api\v1\EvidenceController@create')->name('evidence.create');
     Route::post('/evidence/draft', 'api\v1\EvidenceController@draft')->name('evidence.draft');
     Route::post('/evidence/publish', 'api\v1\EvidenceController@publish')->name('evidence.publish');
     Route::post('/evidence/draft/edit/{id}', 'api\v1\EvidenceController@draft_edit')->name('evidence.draft.edit');
     Route::post('/evidence/publish/edit/{id}', 'api\v1\EvidenceController@publish_edit')->name('evidence.publish.edit');
-});;
+});
 
 Route::get('/evidence/view/{id}', 'api\v1\EvidenceController@view')->name('evidence.view');
 Route::post('/evidence/remove/{id}', 'api\v1\EvidenceController@remove')->name('evidence.remove');
 Route::post('/evidence/reedit/{id}', 'api\v1\EvidenceController@reedit')->name('evidence.reedit');
-Route::middleware(['checknotnull:Evidence','evidencemine'])->group(function () {
+
+/**
+ *  EVIDENCES COORDINATOR
+ */
+Route::group(['prefix' => '{instance}/api/v1/coordinator'], function(){
+    Route::get('/evidence/list/all', 'api\v1\EvidenceCoordinatorController@all')->name('coordinator.evidence.list.all');
+    Route::get('/evidence/list/pending', 'api\v1\EvidenceCoordinatorController@pending')->name('coordinator.evidence.list.pending');
+    Route::post('/evidenceCoordinator/accept/{id}', 'api\v1\coordinator\EvidenceCoordinatorController@accept')->name('evidence.coordinator.accept');
+    Route::post('/evidenceCoordinator/reject/{id}', 'api\v1\EvidenceCoordinatorController@reject')->name('evidence.coordinator.reject');
 
 
-    Route::middleware(['checkuploadevidences'])->group(function () {
 
-    });
-});
 });
 
