@@ -46,6 +46,8 @@ Route::post('/evidence/reedit/{id}', 'api\v1\EvidenceController@reedit')->name('
 Route::group(['prefix' => '{instance}/api/v1/coordinator'], function(){
     Route::get('/evidence/list/all', 'api\v1\EvidenceCoordinatorController@all')->name('coordinator.evidence.list.all');
     Route::get('/evidence/list/pending', 'api\v1\EvidenceCoordinatorController@pending')->name('coordinator.evidence.list.pending');
+    Route::get('/evidence/list/accepted', 'api\v1\EvidenceCoordinatorController@accepted')->name('coordinator.evidence.list.accepted');
+    Route::get('/evidence/list/rejected', 'api\v1\EvidenceCoordinatorController@rejected')->name('coordinator.evidence.list.rejected');
     Route::post('/evidenceCoordinator/accept/{id}', 'api\v1\coordinator\EvidenceCoordinatorController@accept')->name('evidence.coordinator.accept');
     Route::post('/evidenceCoordinator/reject/{id}', 'api\v1\EvidenceCoordinatorController@reject')->name('evidence.coordinator.reject');
 

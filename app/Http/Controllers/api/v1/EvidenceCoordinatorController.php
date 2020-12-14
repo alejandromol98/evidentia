@@ -43,26 +43,24 @@ class EvidenceCoordinatorController extends Controller
 
     public function accepted()
     {
-        $instance = \Instantiation::instance();
+        //$instance = \Instantiation::instance();
 
-        $coordinator = Auth::user()->coordinator;
+        $coordinator = auth('api')->user()->coordinator;
         $comittee = $coordinator->comittee;
         $evidences = $comittee->evidences_accepted()->paginate(10);
 
-        return view('evidence.coordinator.list',
-            ['instance' => $instance, 'evidences' => $evidences]);
+        return $evidences;
     }
 
     public function rejected()
     {
-        $instance = \Instantiation::instance();
+        //$instance = \Instantiation::instance();
 
-        $coordinator = Auth::user()->coordinator;
+        $coordinator = auth('api')->user()->coordinator;
         $comittee = $coordinator->comittee;
         $evidences = $comittee->evidences_rejected()->paginate(10);
 
-        return view('evidence.coordinator.list',
-            ['instance' => $instance, 'evidences' => $evidences]);
+        return $evidences;
     }
 
     public function accept($instance,$id)
@@ -91,6 +89,5 @@ class EvidenceCoordinatorController extends Controller
         $reasonrejection->save();
 
         return response()->json('Evidencia rechazada con éxito.');
-        //return redirect()->route('coordinator.evidence.list.rejected',$instance)->with('success', 'Evidencia rechazada con éxito.');
     }
 }
