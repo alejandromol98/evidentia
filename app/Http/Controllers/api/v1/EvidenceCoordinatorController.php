@@ -68,10 +68,14 @@ class EvidenceCoordinatorController extends Controller
         //$instance = \Instantiation::instance();
 
         $evidence = Evidence::find($id);
-        $evidence->status = 'ACCEPTED';
-        $evidence->save();
+        $userid = $evidence->user->id;
+        if(auth('api')->id() == $userid){
+            $evidence->status = 'ACCEPTED';
+            $evidence->save();
 
-        return response()->json('Evidencia aceptada con éxito.');
+            return response()->json('Evidencia aceptada con éxito.');
+        }
+        return response()->json('El usuario no tiene permisos.');
     }
 
     public function reject(Request $request,$instance,$id)
@@ -79,15 +83,19 @@ class EvidenceCoordinatorController extends Controller
         //$instance = \Instantiation::instance();
 
         $evidence = Evidence::find($id);
-        $evidence->status = 'REJECTED';
-        $evidence->save();
+        $userid = $evidence->user->id;
+        if(auth('api')->id() == $userid){
+            $evidence->status = 'REJECTED';
+            $evidence->save();
 
-        $reasonrejection = ReasonRejection::create([
-            'reason' => $request->input('reasonrejection'),
-            'evidence_id' => $id
-        ]);
-        $reasonrejection->save();
+            $reasonrejection = ReasonRejection::create([
+                'reason' => $request->input('reasonrejection'),
+                'evidence_id' => $id
+            ]);
+            $reasonrejection->save();
 
-        return response()->json('Evidencia rechazada con éxito.');
+            return response()->json('Evidencia rechazada con éxito.');
+        }
+        return response()->json('El usuario no tiene permisos.');
     }
 }
