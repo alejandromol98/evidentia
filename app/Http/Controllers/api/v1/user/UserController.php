@@ -24,8 +24,26 @@ class UserController extends Controller
 
     public function view($instance,$id)
     {
-        $user = User::find($id);
-        return $user;
+
+        if(auth('api')->id() == $id()){
+            $user = User::find($id);
+            if($user){
+                return $user;
+            }
+            else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario seleccionado no existe.'
+                ],400);
+            }
+        }
+        else {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ],401);
+        }
+
     }
 
     /****************************************************************************
@@ -77,7 +95,15 @@ class UserController extends Controller
 
     public function edit(Request $request, $instance,$id)
     {
-        return $this->save($request, $id);
+        if(auth('api')->id() == $id()){
+            return $this->save($request, $id);
+        }
+        else {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ],401);
+        }
     }
 
 
@@ -97,11 +123,13 @@ class UserController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'User selected doesn´t exist.'
-            ],500);
+                'message' => 'El usuario seleccionado no existe.'
+            ],400);
         }
 
         return $user;
+
+
     }
 
     /****************************************************************************
@@ -110,12 +138,29 @@ class UserController extends Controller
 
     public function remove(Request $request, $instance, $id)
     {
-        $user = User::find($id);
+
 
         // Eliminamos todas las entradas de las entidades asociadas a usuario
-        $this->delete_user($user);
+        if(auth('api')->id() == $id()){
+            $user = User::find($id);
+            if($user){
+                $this->delete_user($user);
+                return response()->json('Se ha eliminado el usuario correctamente');
+            }
+            else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario seleccionado no existe.'
+                ],400);
+            }
+        }
+        else {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ],401);
+        }
 
-        return response()->json('Se ha eliminado el usuario correctamente');
     }
 
     private function delete_user($user){
