@@ -15,11 +15,44 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-//Users
+/**
+ * USERS  LOGIN
+ */
 
-Route::prefix('/user')->group(function(){
+Route::prefix('{instance}/api/v1')->group(function(){
     Route::post('/login', 'api\v1\LoginController@login');
-    Route::middleware('auth:api')->get('/all','api\v1\user\UserController@index');
+    Route::middleware('auth:api')->get('/user/all','api\v1\user\UserController@index');
 });
 
+/**
+ *  EVIDENCES
+ */
+Route::group(['prefix' => '{instance}/api/v1'], function(){
+    Route::middleware('auth:api')->get('/evidence/list', 'api\v1\EvidenceController@list')->name('evidence.list');
+    Route::middleware('auth:api')->get('/evidence/create', 'api\v1\EvidenceController@create')->name('evidence.create');
+    Route::middleware('auth:api')->post('/evidence/draft', 'api\v1\EvidenceController@draft')->name('evidence.draft');
+    Route::middleware('auth:api')->post('/evidence/publish', 'api\v1\EvidenceController@publish')->name('evidence.publish');
+    Route::middleware('auth:api')->post('/evidence/draft/edit/{id}', 'api\v1\EvidenceController@draft_edit')->name('evidence.draft.edit');
+    Route::middleware('auth:api')->post('/evidence/publish/edit/{id}', 'api\v1\EvidenceController@publish_edit')->name('evidence.publish.edit');
+    Route::middleware('auth:api')->get('/evidence/view/{id}', 'api\v1\EvidenceController@view')->name('evidence.view');
+    Route::middleware('auth:api')->post('/evidence/remove/{id}', 'api\v1\EvidenceController@remove')->name('evidence.remove');
+    Route::middleware('auth:api')->post('/evidence/reedit/{id}', 'api\v1\EvidenceController@reedit')->name('evidence.reedit');
+});
+
+
+
+/**
+ *  EVIDENCES COORDINATOR
+ */
+Route::group(['prefix' => '{instance}/api/v1/coordinator'], function(){
+    Route::middleware('auth:api')->get('/evidence/list/all', 'api\v1\EvidenceCoordinatorController@all')->name('coordinator.evidence.list.all');
+    Route::middleware('auth:api')->get('/evidence/list/pending', 'api\v1\EvidenceCoordinatorController@pending')->name('coordinator.evidence.list.pending');
+    Route::middleware('auth:api')->get('/evidence/list/accepted', 'api\v1\EvidenceCoordinatorController@accepted')->name('coordinator.evidence.list.accepted');
+    Route::middleware('auth:api')->get('/evidence/list/rejected', 'api\v1\EvidenceCoordinatorController@rejected')->name('coordinator.evidence.list.rejected');
+    Route::middleware('auth:api')->post('/evidenceCoordinator/accept/{id}', 'api\v1\EvidenceCoordinatorController@accept')->name('evidence.coordinator.accept');
+    Route::middleware('auth:api')->post('/evidenceCoordinator/reject/{id}', 'api\v1\EvidenceCoordinatorController@reject')->name('evidence.coordinator.reject');
+
+
+
+});
 
