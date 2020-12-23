@@ -25,7 +25,7 @@ class MeetingSecretaryController extends Controller
 
         return $meetings;
     }
-
+/*
     public function create()
     {
         $instance = \Instantiation::instance();
@@ -36,7 +36,7 @@ class MeetingSecretaryController extends Controller
         return view('meeting.createandedit',
             ['instance' => $instance, 'users' => $users, 'defaultlists' => $defaultlists, 'route' => route('secretary.meeting.new',$instance)]);
     }
-
+*/
     public function new(Request $request)
     {
 
@@ -60,7 +60,7 @@ class MeetingSecretaryController extends Controller
             'datetime' => $request->input('date')." ".$request->input('time')
         ]);
 
-        $meeting->comittee()->associate(Auth::user()->secretary->comittee);
+        $meeting->comittee()->associate(auth('api')->user()->secretary->comittee);
 
         $meeting->save();
 
@@ -79,6 +79,7 @@ class MeetingSecretaryController extends Controller
 
     }
 
+    /*
     public function edit($instance,$id)
     {
         $meeting = Meeting::find($id);
@@ -89,15 +90,16 @@ class MeetingSecretaryController extends Controller
             ['instance' => $instance, 'meeting' => $meeting, 'edit' => true, 'users' => $users, 'defaultlists' => $defaultlists, 'route' => route('secretary.meeting.save',$instance)]);
     }
 
+    */
     public function defaultlist($instance,$id)
     {
         return DefaultList::find($id)->users;
     }
 
-    public function save(Request $request)
+    public function save(Request $request, $instance, $id)
     {
 
-        $instance = \Instantiation::instance();
+        //$instance = \Instantiation::instance();
 
         $validatedData = $request->validate([
             'title' => 'required|min:5|max:255',
@@ -109,7 +111,7 @@ class MeetingSecretaryController extends Controller
             'users' => 'required|array|min:1'
         ]);
 
-        $meeting = Meeting::find($request->_id);
+        $meeting = Meeting::find($id);
         $meeting->title = $request->input('title');
         $meeting->hours = $request->input('hours');
         $meeting->type = $request->input('type');
@@ -134,7 +136,7 @@ class MeetingSecretaryController extends Controller
             $meeting->users()->attach($user);
         }
 
-        return redirect()->route('secretary.meeting.list',$instance)->with('success', 'Reunión editada con éxito.');
+        return $meeting;
 
     }
 
