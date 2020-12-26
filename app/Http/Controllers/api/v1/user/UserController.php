@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Rules\MaxCharacters;
 use App\Rules\MinCharacters;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
 class UserController extends Controller
 {
     /****************************************************************************
@@ -25,7 +28,7 @@ class UserController extends Controller
     public function view($instance,$id)
     {
 
-        if(auth('api')->id() == $id()){
+        if(auth('api')->id() == $id){
             $user = User::find($id);
             if($user){
                 return $user;
@@ -57,36 +60,49 @@ class UserController extends Controller
 
         $user = $this->new_user($request);
 
-        return $user->toJson();
+        return $user;
 
     }
 
     private function new_user($request)
     {
 
-        $request->validate([
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
             'name' => 'required|min:5|max:255',
-            'username' => 'required|min:5|max:255',
+            'username' => 'required|min:5|max:255|unique:users',
             'password' => 'required|min:8|max:255',
-            'email' => 'required|string',
+            'email' => 'required|string|unique:users',
+            'dni'=> 'required|string|unique:users',
             'biography' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
         ]);
 
-        // creación de un nuevo usuario
-        $user = User::create([
-            'name' => $request->input('name'),
-            'surname' => $request->input('surname'),
-            'username' => $request->input('username'),
-            'password' => $request->input('password'),
-            'email' => $request->input('email'),
-            'dni' => $request->input('dni'),
-            'participation' => $request->input('participation'),
-            'biography' => $request->input('biography')
-        ]);
+        if($validator -> fails()){
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ],401);
+        }
+        else {
+            // creación de un nuevo usuario
+            $user = User::create([
+                'name' => $request->input('name'),
+                'surname' => $request->input('surname'),
+                'username' => $request->input('username'),
+                'password' => Hash::make($request->input('password')),
+                'email' => $request->input('email'),
+                'dni' => $request->input('dni'),
+                'participation' => $request->input('participation'),
+                'biography' => $request->input('biography')
+            ]);
 
-        $user->save();
+            $user->save();
 
-        return $user;
+            return $user->toJson();
+        }
+
+
     }
 
     /****************************************************************************
@@ -95,7 +111,7 @@ class UserController extends Controller
 
     public function edit(Request $request, $instance,$id)
     {
-        if(auth('api')->id() == $id()){
+        if(auth('api')->id() == $id){
             return $this->save($request, $id);
         }
         else {
@@ -109,26 +125,36 @@ class UserController extends Controller
 
     public function save($request, $id)
     {
-        $request->validate([
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
             'name' => 'required|min:5|max:255',
             'username' => 'required|min:5|max:255',
             'password' => 'required|min:8|max:255',
             'email' => 'required|string',
+            'dni'=> 'required|string',
             'biography' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
         ]);
 
-        $user = User::find($id);
-        if($user){
-            $user_new = $user->fill($request->all())->save();
-        } else {
+        if($validator -> fails()){
             return response()->json([
                 'success' => false,
-                'message' => 'El usuario seleccionado no existe.'
-            ],400);
+                'message' => $validator->errors()
+            ],401);
         }
+        else {
+            $user = User::find($id);
+            if($user){
+                $user_new = $user->fill($request->all())->save();
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario seleccionado no existe.'
+                ],400);
+            }
 
-        return $user;
-
+            return $user;
+        }
 
     }
 
@@ -141,7 +167,7 @@ class UserController extends Controller
 
 
         // Eliminamos todas las entradas de las entidades asociadas a usuario
-        if(auth('api')->id() == $id()){
+        if(auth('api')->id() == $id){
             $user = User::find($id);
             if($user){
                 $this->delete_user($user);
