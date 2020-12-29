@@ -35,7 +35,10 @@ class EvidenceController extends Controller
             return $evidence;
         }
 
-        return response()->json( 'El usuario no tiene permisos.');
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no tiene permisos.'
+        ], 403);
 
     }
 
@@ -247,7 +250,10 @@ class EvidenceController extends Controller
                     ], 500);
                 }
             } else {
-                return response()->json( 'El usuario no tiene permisos.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario no tiene permisos.'
+                ], 403);
             }
 
         return $evidence;
@@ -269,7 +275,10 @@ class EvidenceController extends Controller
 
         } else {
 
-            return response()->json('El usuario no tiene permisos');
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ], 403);
         }
 
     }
