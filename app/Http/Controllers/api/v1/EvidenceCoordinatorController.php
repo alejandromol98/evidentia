@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use App\Evidence;
 use App\ReasonRejection;
+use App\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,35 +68,102 @@ class EvidenceCoordinatorController extends Controller
     {
         //$instance = \Instantiation::instance();
 
-        $evidence = Evidence::find($id);
-        $userid = $evidence->user->id;
-        if(auth('api')->id() == $userid){
-            $evidence->status = 'ACCEPTED';
-            $evidence->save();
+        //$evidence = Evidence::find($id);
+        //$userid = $evidence->user->id;
 
-            return response()->json('Evidencia aceptada con éxito.');
+        //if(auth('api')->id() == $userid){
+        //    $evidence->status = 'ACCEPTED';
+        //    $evidence->save();
+
+        //    return response()->json('Evidencia aceptada con éxito.');
+        //}
+        //return response()->json([
+        //    'success' => false,
+        //    'message' => 'El usuario no tiene permisos.'
+        //], 403);
+
+        if(auth('api')->user()->coordinator){
+
+            $evidence = Evidence::find($id);
+            $comittee_evidence = $evidence->comittee;
+
+            $coordinator = auth('api')->user()->coordinator;
+            $comittee_coordinator = $coordinator->comittee;
+
+            if($comittee_evidence == $comittee_coordinator){
+                $evidence->status = 'ACCEPTED';
+                $evidence->save();
+
+                return response()->json('Evidencia aceptada con éxito.');
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos sobre este comité.'
+            ], 403);
         }
-        return response()->json('El usuario no tiene permisos.');
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no es coordinador.'
+        ], 403);
     }
 
     public function reject(Request $request,$instance,$id)
     {
         //$instance = \Instantiation::instance();
 
-        $evidence = Evidence::find($id);
-        $userid = $evidence->user->id;
-        if(auth('api')->id() == $userid){
-            $evidence->status = 'REJECTED';
-            $evidence->save();
+        //$evidence = Evidence::find($id);
+        //$userid = $evidence->user->id;
+        //if(auth('api')->id() == $userid){
+            //$evidence->status = 'REJECTED';
+            //$evidence->save();
 
-            $reasonrejection = ReasonRejection::create([
-                'reason' => $request->input('reasonrejection'),
-                'evidence_id' => $id
-            ]);
-            $reasonrejection->save();
+            //$reasonrejection = ReasonRejection::create([
+                //'reason' => $request->input('reasonrejection'),
+                //'evidence_id' => $id
+            //]);
+            //$reasonrejection->save();
 
-            return response()->json('Evidencia rechazada con éxito.');
+            //return response()->json('Evidencia rechazada con éxito.');
+        //}
+        //return response()->json([
+            //'success' => false,
+            //'message' => 'El usuario no tiene permisos.'
+        //], 403);
+
+        if(auth('api')->user()->coordinator){
+
+            $evidence = Evidence::find($id);
+            $comittee_evidence = $evidence->comittee;
+
+            $coordinator = auth('api')->user()->coordinator;
+            $comittee_coordinator = $coordinator->comittee;
+
+            if($comittee_evidence == $comittee_coordinator){
+                $evidence->status = 'REJECTED';
+                $evidence->save();
+
+                $reasonrejection = ReasonRejection::create([
+                    'reason' => $request->input('reasonrejection'),
+                    'evidence_id' => $id
+                ]);
+                $reasonrejection->save();
+
+                return response()->json('Evidencia rechazada con éxito.');
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos sobre este comité.'
+            ], 403);
+
         }
-        return response()->json('El usuario no tiene permisos.');
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no es coordinador.'
+        ], 403);
+
     }
 }
