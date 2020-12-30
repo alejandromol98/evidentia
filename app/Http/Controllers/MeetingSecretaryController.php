@@ -105,7 +105,10 @@ class MeetingSecretaryController extends Controller
             }
             return redirect()->route('secretary.meeting.list',$instance)->with('success', 'Reunión creada con éxito.');
         } else {
-            return response()->json('El usuario no es secretario');
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no es secretario.'
+            ], 403);
         }
     }
 
@@ -132,7 +135,10 @@ class MeetingSecretaryController extends Controller
                 ], 403);
             }
         } else {
-            return response()->json('El usuario no es secretario.');
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no es secretario.'
+            ], 403);
         }
     }
 
@@ -198,7 +204,10 @@ class MeetingSecretaryController extends Controller
                 ], 403);
             }
         } else {
-            return response()->json('El usuario no es secretario.');
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no es secretario.'
+            ], 403);
         }
     }
 
@@ -223,7 +232,10 @@ class MeetingSecretaryController extends Controller
                 ], 403);
             }
         } else {
-            return response()->json('El usuario no es secretario.');
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no es secretario.'
+            ], 403);
         }
     }
 }
