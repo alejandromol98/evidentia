@@ -14,22 +14,14 @@ class MeetingSecretaryController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('checkroles:SECRETARY');
+        $this->middleware('checkrolesapi:SECRETARY');
     }
 
     public function list()
     {
         //$instance = \Instantiation::instance();
-
-        if(Auth::user()->secretary) {
-            $meetings = auth('api')->user()->secretary->comittee->meetings()->get();
-            return $meetings;
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'El usuario no es secretario.'
-            ], 403);
-        }
+        $meetings = auth('api')->user()->secretary->comittee->meetings()->get();
+        return $meetings;
     }
 /*
     public function create()
@@ -68,27 +60,19 @@ class MeetingSecretaryController extends Controller
 
         $meeting->comittee()->associate(auth('api')->user()->secretary->comittee);
 
-        if(auth('api')->user()->secretary){
-            $meeting->save();
+        $meeting->save();
 
-            // Asociamos los usuarios a la reunión
-            $users_ids = $request->input('users',[]);
+        // Asociamos los usuarios a la reunión
+        $users_ids = $request->input('users',[]);
 
-            foreach($users_ids as $user_id)
-            {
+        foreach($users_ids as $user_id)
+        {
 
-                $user = User::find($user_id);
-                $meeting->users()->attach($user);
+            $user = User::find($user_id);
+            $meeting->users()->attach($user);
 
-            }
-
-            return $meeting;
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'El usuario no es secretario.'
-            ], 403);
         }
+        return $meeting;
     }
 
     /*
@@ -130,7 +114,12 @@ class MeetingSecretaryController extends Controller
         $meeting->place = $request->input('place');
         $meeting->datetime = $request->input('date')." ".$request->input('time');
 
-        if(auth('api')->user()->secretary) {
+        $comittee_meeting = $meeting->comittee;
+
+        $secretary = auth('api')->user()->secretary;
+        $comittee_secretary = $secretary->comittee;
+
+        if($comittee_meeting == $comittee_secretary) {
             $meeting->save();
 
             // Asociamos los usuarios a la reunión
@@ -153,7 +142,7 @@ class MeetingSecretaryController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'El usuario no es secretario.'
+                'message' => 'El usuario no tiene permisos sobre este comité.'
             ], 403);
         }
     }
@@ -162,20 +151,20 @@ class MeetingSecretaryController extends Controller
     {
         //$instance = \Instantiation::instance();
 
-        if(auth('api')->user()->secretary) {
-            $meeting = Meeting::find($id);
-            $comittee_meeting = $meeting->comittee;
+        $meeting = Meeting::find($id);
+        $comittee_meeting = $meeting->comittee;
 
-            $secretary = auth('api')->user()->secretary;
-            $comittee_secretary = $secretary->comittee;
+        $secretary = auth('api')->user()->secretary;
+        $comittee_secretary = $secretary->comittee;
 
+        if($comittee_meeting == $comittee_secretary) {
             $meeting->delete();
 
             return response()->json('Reunión eliminada con éxito');
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'El usuario no es secretario.'
+                'message' => 'El usuario no tiene permisos sobre este comité.'
             ], 403);
         }
     }
