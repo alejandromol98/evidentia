@@ -20,7 +20,7 @@ use GuzzleHttp\Client;
  */
 
 Route::prefix('{instance}/api/v1')->group(function(){
-    Route::post('/evidences', 'api\v1\ApiController@evidences_list');
+    Route::get('/evidences', 'api\v1\ApiController@index');
 });
 
 
