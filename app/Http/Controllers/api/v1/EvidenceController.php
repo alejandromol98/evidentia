@@ -29,8 +29,17 @@ class EvidenceController extends Controller
     public function view($instance,$id)
     {
         $evidence = Evidence::find($id);
+        $userid = $evidence->user->id;
 
-        return $evidence;
+        if(auth('api')->id() == $userid){
+            return $evidence;
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no tiene permisos.'
+        ], 403);
+
     }
 
     public function list()
@@ -38,7 +47,7 @@ class EvidenceController extends Controller
         $evidences = Evidence::where(['user_id' => auth('api')->id(),'last' => true])->orderBy('created_at', 'desc')->get();
         //$instance = \Instantiation::instance();
 
-        return $evidences->toJson();
+        return $evidences;
     }
 
     /****************************************************************************
@@ -59,7 +68,6 @@ class EvidenceController extends Controller
 
     public function draft(Request $request)
     {
-
         return $this->new($request,"DRAFT");
     }
 
@@ -77,7 +85,7 @@ class EvidenceController extends Controller
 
         $this->new_files($request,$evidence);
 
-        return $evidence->toJson();
+        return $evidence;
 
     }
 
@@ -219,26 +227,35 @@ class EvidenceController extends Controller
 
 
     private function save($request,$status,$id){
-        $request->validate([
-            'title' => 'required|min:5|max:255',
-            'hours' => 'required|numeric|between:0.5,99.99|max:100',
-            'description' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
-        ]);
 
-        $evidence = Evidence::find($id);
-        if($evidence->status = "DRAFT"){
+            $request->validate([
+                'title' => 'required|min:5|max:255',
+                'hours' => 'required|numeric|between:0.5,99.99|max:100',
+                'description' => ['required', new MinCharacters(10), new MaxCharacters(20000)],
+            ]);
 
-            $evidence->status = $status;
+            $evidence = Evidence::find($id);
+            $userid = $evidence->user->id;
+            if(auth('api')->id() == $userid){
+                if ($evidence->status = "DRAFT") {
 
-        $evidence_new = $evidence->fill($request->all())->save();
+                    $evidence->status = $status;
 
-        }
-        else{
-            return response()->json([
-                'success' => false,
-                'message' => 'Evidence in status PENDING can not be updated'
-            ], 500);
-        }
+                    $evidence_new = $evidence->fill($request->all())->save();
+
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Evidence in status PENDING can not be updated'
+                    ], 500);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario no tiene permisos.'
+                ], 403);
+            }
+
         return $evidence;
     }
 
@@ -249,13 +266,21 @@ class EvidenceController extends Controller
     public function remove(Request $request,$instance,$id)
     {
         $evidence = Evidence::find($id);
+        $userid = $evidence->user->id;
+        if(auth('api')->id() == $userid){
+            // eliminamos recursivamente la evidencia y todas las versiones anteriores, incluyendo archivos
+            $this->delete_evidence($evidence);
 
-        // eliminamos recursivamente la evidencia y todas las versiones anteriores, incluyendo archivos
-        $this->delete_evidence($evidence);
+            return response()->json('Eliminada con éxito');
 
+        } else {
 
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ], 403);
+        }
 
-        return response()->json('Eliminada con éxito');;
     }
 
     private function delete_evidence($evidence)
