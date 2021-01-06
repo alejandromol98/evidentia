@@ -56,3 +56,26 @@ Route::group(['prefix' => '{instance}/api/v1/coordinator'], function(){
 
 });
 
+
+/**
+ *    MEETINGS
+ */
+
+Route::group(['prefix' => '{instance}/api/v1'], function(){
+    Route::middleware('auth:api')->get('/meeting/list', 'api\v1\MeetingController@list')->name('meeting.mylist');
+
+});
+
+/**
+ *    MEETINGS SECRETARY
+ */
+
+
+Route::group(['prefix' => '{instance}/api/v1/secretary'], function(){
+    Route::middleware('auth:api')->get('/meeting/list', 'api\v1\MeetingSecretaryController@list')->name('meeting.list');
+    //Route::middleware('auth:api')->get('/meeting/create', 'api\v1\MeetingSecretaryController@create')->name('secretary.meeting.create');
+    Route::middleware('auth:api')->post('/meeting/new', 'api\v1\MeetingSecretaryController@new')->name('secretary.meeting.list');
+    Route::middleware('auth:api')->post('/meeting/edit/{id}', 'api\v1\MeetingSecretaryController@save')->name('secretary.meeting.list');
+    Route::middleware('auth:api')->post('/meeting/remove/{id}', 'api\v1\MeetingSecretaryController@remove')->name('secretary.meeting.list');
+
+});
