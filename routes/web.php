@@ -172,17 +172,17 @@ Route::group(['prefix' => '{instance}', 'middleware' => ['checkblock']], functio
         /*
          * BONUS
          */
-        Route::get('/bonus/list/', 'BonusSecretaryController@list')->name('secretary.bonus.list');
+        Route::get('/bonus/list/', 'BonusController@list')->name('secretary.bonus.list');
 
         Route::middleware(['checkregisterbonus'])->group(function () {
-            Route::get('/bonus/create/', 'BonusSecretaryController@create')->name('secretary.bonus.create');
-            Route::post('/bonus/new', 'BonusSecretaryController@new')->name('secretary.bonus.new');
+            Route::get('/bonus/create/', 'BonusController@create')->name('secretary.bonus.create');
+            Route::post('/bonus/new', 'BonusController@new')->name('secretary.bonus.new');
         });
 
         Route::middleware(['checknotnull:Bonus','checkregisterbonus'])->group(function () {
-            Route::get('/bonus/edit/{id}', 'BonusSecretaryController@edit')->name('secretary.bonus.edit');
-            Route::post('/bonus/save', 'BonusSecretaryController@save')->name('secretary.bonus.save');
-            Route::post('/bonus/remove', 'BonusSecretaryController@remove')->name('secretary.bonus.remove');
+            Route::get('/bonus/edit/{id}', 'BonusController@edit')->name('secretary.bonus.edit');
+            Route::post('/bonus/save', 'BonusController@save')->name('secretary.bonus.save');
+            Route::post('/bonus/remove', 'BonusController@remove')->name('secretary.bonus.remove');
         });
 
     });

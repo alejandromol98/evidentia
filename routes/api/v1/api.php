@@ -53,3 +53,15 @@ Route::middleware(['checknotnull:Evidence','evidencemine'])->group(function () {
 });
 });
 
+
+/**
+ *  BONUS
+ */
+
+Route::prefix('{instance}/api/v1')->group(function(){
+    Route::get('/bonus/list', 'api\v1\BonusController@list')->name('bonus.list');
+
+    Route::middleware(['checkregisterbonus', 'auth:api'])->group(function () {
+        Route::post('/bonus/new', 'api\v1\BonusController@new')->name('bonus.new');
+    });
+});
