@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('{instance}/api/v1')->group(function(){
     Route::post('/login', 'api\v1\LoginController@login');
-    Route::middleware('auth:api')->get('/all','api\v1\user\UserController@index');
+    Route::middleware('auth:api')->get('user/all','api\v1\user\UserController@index');
     Route::get('/user/view/{id}','api\v1\user\UserController@view');
     Route::post('/user/new', 'api\v1\user\UserController@new')->name('user.new');
     Route::post('/user/edit/{id}', 'api\v1\user\UserController@edit')->name('user.edit');
@@ -89,9 +89,10 @@ Route::group(['prefix' => '{instance}/api/v1/secretary'], function(){
  *  BONUS
  */
 
-Route::prefix('{instance}/api/v1')->group(function(){
+Route::prefix('{instance}/api/v1')->group(function() {
     Route::get('/bonus/list', 'api\v1\BonusController@list')->name('bonus.list');
 
     Route::middleware(['checkregisterbonus', 'auth:api'])->group(function () {
         Route::post('/bonus/new', 'api\v1\BonusController@new')->name('bonus.new');
     });
+});
