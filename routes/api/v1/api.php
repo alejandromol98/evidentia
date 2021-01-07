@@ -88,10 +88,12 @@ Route::group(['prefix' => '{instance}/api/v1/secretary'], function(){
 /**
  *  BONUS
  */
-
-Route::prefix('{instance}/api/v1')->group(function(){
+Route::prefix('{instance}/api/v1')->group(function() {
     Route::get('/bonus/list', 'api\v1\BonusController@list')->name('bonus.list');
 
     Route::middleware(['checkregisterbonus', 'auth:api'])->group(function () {
         Route::post('/bonus/new', 'api\v1\BonusController@new')->name('bonus.new');
     });
+    Route::post('/bonus/edit/{id}', 'api\v1\BonusController@edit')->name('bonus.edit');
+    Route::post('/bonus/remove/{id}', 'api\v1\BonusController@remove')->name('bonus.remove');
+});
