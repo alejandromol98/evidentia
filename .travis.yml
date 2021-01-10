@@ -3,12 +3,17 @@ os:
 
 language: php
 
+dist: trusty
+
 php:
   - '7.3'
 
+services:
+  - mysql
+
 before_script:
   - cp .env.travis .env
-  - sudo mysql -e 'CREATE DATABASE homestead;'
+  - sudo mysql -e 'CREATE DATABASE IF NOT EXISTS homestead;'
   - composer self-update
   - composer install --no-interaction
   - php artisan migrate --no-interaction -vvv
