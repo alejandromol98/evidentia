@@ -7,15 +7,11 @@ php:
   - '7.3'
 
 before_script:
+  - cp .env.travis .env
+  - sudo mysql -e 'CREATE DATABASE homestead;'
   - composer self-update
   - composer install --no-interaction
-  - cp .env.travis .env
-  - pear install pear/PHP_CodeSniffer
-  - phpenv rehash
-  - nvm install 7.7.1
-  - npm install npm@latest -g
-  - npm install -g jshint
-  - npm install
+  - php artisan migrate --no-interaction -vvv
 
 script:
   - vendor/bin/phpunit
