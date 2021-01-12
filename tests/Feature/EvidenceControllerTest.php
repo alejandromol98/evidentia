@@ -90,4 +90,70 @@ class EvidenceControllerTest extends TestCase
 
         $response->assertStatus(302);
     }
+
+    //Editamos una evidencia que pertenece al usuario.
+    public function testEditEvidenceOk()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([]);
+        $this->actingAs($user, 'api');
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario2@secretario2.com',
+            'password' => Hash::make('secretario2')
+        ]);
+
+        $request = [
+            'title' => 'Ejemplo de edición de evidencia',
+            'description' => 'Descripción de la evidencia',
+            'hours' => '8',
+            'files' => [],
+        ];
+        $this->actingAs($user, 'api');
+
+        //See Below
+        //$token = $user->generateToken();
+
+        //$headers = [ 'Authorization' => 'Bearer ' +$token];
+
+        $response = $this->post('20/api/v1/evidence/publish/edit/1',$request);
+
+        $response->assertStatus(201);
+    }
+
+    //Editamos una evidencia que no pertenece al usuario.
+    public function testEditEvidenceNotOk()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([]);
+        $this->actingAs($user, 'api');
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario2@secretario2.com',
+            'password' => Hash::make('secretario2')
+        ]);
+
+        $request = [
+            'title' => 'Ejemplo de edición de evidencia',
+            'description' => 'Descripción de la evidencia',
+            'hours' => '8',
+            'files' => [],
+        ];
+        $this->actingAs($user, 'api');
+
+        //See Below
+        //$token = $user->generateToken();
+
+        //$headers = [ 'Authorization' => 'Bearer ' +$token];
+
+        $response = $this->post('20/api/v1/evidence/publish/edit/4',$request);
+
+        $response->assertStatus(403);
+    }
+
+
 }

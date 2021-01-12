@@ -20,11 +20,12 @@ use Illuminate\Http\Response;
 
 class EvidenceController extends Controller
 {
-    public function __construct()
+    /*public function __construct()
     {
         //$this->middleware('auth'); Esto es para usuarios logueados con el sistema de forma normal (email, password)
         $this->middleware('checkrolesapi:PRESIDENT|COORDINATOR|REGISTER_COORDINATOR|SECRETARY|STUDENT');
     }
+    */
 
     public function view($instance,$id)
     {
@@ -34,6 +35,7 @@ class EvidenceController extends Controller
         if(auth('api')->id() == $userid){
             return $evidence;
         }
+
 
         return response()->json([
             'success' => false,
@@ -46,8 +48,16 @@ class EvidenceController extends Controller
     {
         $evidences = Evidence::where(['user_id' => auth('api')->id(),'last' => true])->orderBy('created_at', 'desc')->get();
         //$instance = \Instantiation::instance();
+        if($evidences){
+            return $evidences;
+        }
 
-        return $evidences;
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no tiene evidencias.'
+        ], 403);
+
+
     }
 
     /****************************************************************************
