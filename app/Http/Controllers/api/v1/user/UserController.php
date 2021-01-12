@@ -145,7 +145,9 @@ class UserController extends Controller
         else {
             $user = User::find($id);
             if($user){
-                $user_new = $user->fill($request->all())->save();
+                $user_new = $user->fill($request->all());
+                $user_new['password'] = Hash::make($request->input('password'));
+                $user_new->save();
             } else {
                 return response()->json([
                     'success' => false,
