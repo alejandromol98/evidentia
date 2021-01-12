@@ -1,4 +1,8 @@
-on: push
+on:
+  push:
+    branches: [ $integracion ]
+  pull_request:
+    branches: [ $integracion ]
 name: CI
 jobs:
   phpunit:
