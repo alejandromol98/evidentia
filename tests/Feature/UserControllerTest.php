@@ -44,4 +44,47 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(302);
     }
+
+    public function testShowUserOK()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario1@secretario1.com',
+            'password' => Hash::make('secretario1')
+        ]);
+        $this->actingAs($user, 'api');
+
+        //See Below
+        //$token = $user->generateToken();
+
+        //$headers = [ 'Authorization' => 'Bearer ' +$token];
+
+        $response = $this->get('20/api/v1/user/view/3');
+
+        $response->assertStatus(200);
+    }
+
+    public function testShowUserNotOK()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario2@secretario2.com',
+            'password' => Hash::make('secretario2')
+        ]);
+        $this->actingAs($user, 'api');
+
+        //See Below
+        //$token = $user->generateToken();
+
+        //$headers = [ 'Authorization' => 'Bearer ' +$token];
+
+        $response = $this->get('20/api/v1/user/view/3');
+
+        $response->assertStatus(401);
+    }
+
 }
