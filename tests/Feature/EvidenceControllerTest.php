@@ -24,9 +24,6 @@ class EvidenceControllerTest extends TestCase
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create([]);
-        $this->actingAs($user, 'api');
-
         $user = factory(User::class)->create([
             'email' => 'secretario1@secretario1.com',
             'password' => Hash::make('secretario1')
@@ -55,9 +52,6 @@ class EvidenceControllerTest extends TestCase
     {
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
-
-        $user = factory(User::class)->create([]);
-        $this->actingAs($user, 'api');
 
         $user = factory(User::class)->create([
             'email' => 'secretario2@secretario2.com',
@@ -97,8 +91,6 @@ class EvidenceControllerTest extends TestCase
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create([]);
-        $this->actingAs($user, 'api');
 
         $user = factory(User::class)->create([
             'email' => 'secretario2@secretario2.com',
@@ -128,9 +120,6 @@ class EvidenceControllerTest extends TestCase
     {
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
-
-        $user = factory(User::class)->create([]);
-        $this->actingAs($user, 'api');
 
         $user = factory(User::class)->create([
             'email' => 'secretario2@secretario2.com',
