@@ -107,4 +107,108 @@ class UserControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    /*
+     * EDIT USER: un usuario no puede editar ni su dni ni su username
+     */
+
+    // Test Edit User 1: un usuario intenta editar sus datos personales correctamente
+    public function testEditUserOK()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'coordinador1@coordinador1.com',
+            'password' => Hash::make('coordinador1')
+        ]);
+        $this->actingAs($user, 'api');
+
+        $request = [
+            "name" => "Margaret",
+            "surname" => "Hendricks",
+            "password" => "coordinador1",
+            "email" => "coordinador1@coordinador1.com",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario se ha editado correctamente"
+        ];
+
+        $response = $this->post('20/api/v1/user/edit/5', $request);
+
+        $response->assertStatus(200);
+    }
+
+    // Test Edit User 2: un usuario intenta editar a otro usuario. Devuelve error 401 Unauthorized
+    public function testEditUserNotOKNotLogged()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'coordinador2@coordinador2.com',
+            'password' => Hash::make('coordinador2')
+        ]);
+        $this->actingAs($user, 'api');
+
+        $request = [
+            "name" => "Ejemplo",
+            "surname" => "Ejemplo",
+            "password" => "coordinador1",
+            "email" => "coordinador1@coordinador1.com",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario se ha editado"
+        ];
+
+        $response = $this->post('20/api/v1/user/edit/5', $request);
+
+        $response->assertStatus(401);
+    }
+
+    // Test Edit User 3: un usuario intenta editar su email y poner otro que ya existe. Devuelve error 401 Unauthorized
+    public function testEditUserNotOKEmailNotUnique()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'coordinadorregistro1@coordinadorregistro1.com',
+            'password' => Hash::make('coordinadorregistro1')
+        ]);
+        $this->actingAs($user, 'api');
+
+        $request = [
+            "name" => "Ejemplo",
+            "surname" => "Ejemplo",
+            "email" => "coordinador1@coordinador1.com",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario se ha editado"
+        ];
+
+        $response = $this->post('20/api/v1/user/edit/7', $request);
+
+        $response->assertStatus(401);
+    }
+
+    // Test Edit User 4: un usuario intenta editar sus datos sin enviar los atributos requeridos (name,surname, biography o assistance). Devuelve error 401 Unauthorized
+    public function testEditUserNotOKDataNotProvided()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'coordinadorregistro2@coordinadorregistro2.com',
+            'password' => Hash::make('coordinadorregistro2')
+        ]);
+        $this->actingAs($user, 'api');
+
+        $request = [
+            "email" => "coordinador1@coordinador1.com",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario se ha editado"
+        ];
+
+        $response = $this->post('20/api/v1/user/edit/8', $request);
+
+        $response->assertStatus(401);
+    }
+
 }

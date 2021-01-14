@@ -107,6 +107,7 @@ class UserController extends Controller
 
     /****************************************************************************
      * EDIT AN USER
+     * Un usuario no puede editar ni su dni ni su username/uvus, por lo que aunque se envíe, no se cambia en bd
      ****************************************************************************/
 
     public function edit(Request $request, $instance,$id)
@@ -125,38 +126,56 @@ class UserController extends Controller
 
     public function save($request, $id)
     {
+        $user = User::find($id);
         $data = $request->all();
+        if($user){
 
-        $validator = Validator::make($data, [
-            'name' => 'required|min:5|max:255',
-            'username' => 'required|min:5|max:255',
-            'password' => 'required|min:8|max:255',
-            'email' => 'required|string',
-            'dni'=> 'required|string',
-            'biography' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
-        ]);
+            $validator = Validator::make($data, [
+                'name' => 'required|min:5|max:255',
+                'surname' => 'required|max:255',
+                'password' => 'min:8|max:255',
+                'biography' => ['required',new MinCharacters(10),new MaxCharacters(20000)],
+                'participation' => 'required|string',
+            ]);
+            if($validator -> fails()){
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()
+                ],401);
+            }
 
-        if($validator -> fails()){
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()
-            ],401);
-        }
-        else {
-            $user = User::find($id);
-            if($user){
-                $user_new = $user->fill($request->all());
-                $user_new['password'] = Hash::make($request->input('password'));
-                $user_new->save();
-            } else {
+            // si el usuario cambia el email, comprueba que el nuevo sea único
+            if($request->input('email') != $user->email) {
+                $validatorEmail = Validator::make($data, [
+                    'email' => 'required|max:255|unique:users',
+                ]);
+                if($validatorEmail -> fails()){
+                    return response()->json([
+                        'success' => false,
+                        'message' => $validatorEmail->errors()
+                    ],401);
+                }
+            }
+
+
+            $user['name'] = $request->input('name');
+            $user['surname'] = $request->input('surname');
+            $user['email'] = $request->input('email');
+            if($request->input('password')){
+                $user['password'] = Hash::make($request->input('password'));
+            }
+            $user['biography'] = $request->input('biography');
+            $user['participation'] = $request->input('participation');
+
+            $user->save();
+        } else {
                 return response()->json([
                     'success' => false,
                     'message' => 'El usuario seleccionado no existe.'
                 ],400);
-            }
-
-            return $user;
         }
+
+        return $user;
 
     }
 
