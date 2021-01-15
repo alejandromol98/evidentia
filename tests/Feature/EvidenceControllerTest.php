@@ -39,8 +39,8 @@ class EvidenceControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         $request = [
-            'email' => 'secretario1@secretario1.com',
-            'password' => 'secretario1'
+            'email' => 'coordinador1@coordinador1.com',
+            'password' => 'coordinador1'
         ];
 
         $response = $this->post('20/api/v1/login',$request);
