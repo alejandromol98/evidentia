@@ -67,4 +67,49 @@ class DefaultListSecretaryController extends Controller
         }
         return $defaultlist;
     }
+
+    /*public function edit($instance,$id)
+    {
+
+        $instance = \Instantiation::instance();
+        $defaultlist = DefaultList::find($id);
+        $users = User::orderBy('surname')->get();
+
+        return view('defaultlist.createandedit',
+            ['instance' => $instance, 'defaultlist' => $defaultlist,
+                'users' => $users, 'route' => route('secretary.defaultlist.save',$instance), 'edit' => true]);
+
+    } */
+
+    public function save(Request $request, $instance, $id)
+    {
+
+        //$instance = \Instantiation::instance();
+
+        $validatedData = $request->validate([
+            'name' => 'required|max:255',
+        ]);
+
+        $defaultlist = DefaultList::find($id);
+        $defaultlist->name = $request->input('name');
+        $defaultlist->save();
+
+        // Asociamos los usuarios a la reunión
+        $users_ids = $request->input('users',[]);
+
+        // eliminamos usuarios antiguos de la reunión
+        foreach($defaultlist->users as $user)
+        {
+            $defaultlist->users()->detach($user);
+        }
+
+        // agregamos los usuarios nuevos de la reunión
+        foreach($users_ids as $user_id)
+        {
+            $user = User::find($user_id);
+            $defaultlist->users()->attach($user);
+        }
+
+        return $defaultlist;
+    }
 }
