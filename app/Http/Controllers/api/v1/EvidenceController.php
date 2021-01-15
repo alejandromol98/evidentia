@@ -326,14 +326,24 @@ class EvidenceController extends Controller
 
     public function reedit(Request $request,$instance,$id)
     {
-        //$id = $request->_id;
         $evidence = Evidence::find($id);
+        $userid = $evidence->user->id;
+        if(auth('api')->id() == $userid){
 
-        $evidence->status = "DRAFT";
+            $evidence->status = "DRAFT";
 
-        $evidence->save();
+            $evidence->save();
 
-        return response()->json( 'Evidencia reasignada como borrador con éxito.');
+            return response()->json( 'Evidencia reasignada como borrador con éxito.');
+
+        } else {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ], 403);
+        }
+
     }
 
 }
