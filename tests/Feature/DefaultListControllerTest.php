@@ -43,4 +43,32 @@ class DefaultListControllerTest extends TestCase
 
         $response->assertStatus(302);
     }
+
+    public function testCreateDefaultListOk()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario2@secretario2.com',
+            'password' => Hash::make('secretario2')
+        ]);
+
+        $request = [
+            'name'  => 'Ejemplo de otra default list',
+            'users' => [
+                '1'
+            ],
+        ];
+        $this->actingAs($user, 'api');
+
+        //See Below
+        //$token = $user->generateToken();
+
+        //$headers = [ 'Authorization' => 'Bearer ' +$token];
+
+        $response = $this->post('20/api/v1/secretary/defaultlist/new',$request);
+
+        $response->assertStatus(201);
+    }
 }
