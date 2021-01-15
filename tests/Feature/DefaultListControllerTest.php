@@ -36,4 +36,11 @@ class DefaultListControllerTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function testListEvidencesNotOk()
+    {
+        $response = $this->get('20/api/v1/secretary/defaultlist/list');
+
+        $response->assertStatus(302);
+    }
 }
