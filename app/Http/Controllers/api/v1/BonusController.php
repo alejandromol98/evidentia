@@ -83,7 +83,16 @@ class BonusController extends Controller
 
     public function edit(Request $request,$instance,$id)
     {
-        return $this->save($request,$id);
+        if(auth('api')->user()->secretary){
+
+            return $this->save($request,$id);
+        }
+        else {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ],401);
+        }
     }
 
 
