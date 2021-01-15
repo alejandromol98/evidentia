@@ -112,4 +112,15 @@ class DefaultListSecretaryController extends Controller
 
         return $defaultlist;
     }
+
+    public function remove(Request $request, $instance, $id)
+    {
+        //$instance = \Instantiation::instance();
+
+        $defaultlist = DefaultList::find($id);
+
+        $defaultlist->delete();
+
+        return response()->json('Lista por defecto eliminada con éxito');
+    }
 }
