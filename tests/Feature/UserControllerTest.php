@@ -87,6 +87,29 @@ class UserControllerTest extends TestCase
      * Test Create New User
      * Un usuario no podrá ser creado si ya existe otro con el mismo "username", "email" o "dni
      */
+
+
+    public function testCreateUserOK(){
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+
+        $request = [
+            "name" => "Miguel12",
+            "surname" => "Saavedra12",
+            "username" => "test123",
+            "password" => "test12356789",
+            "email" => "test@test.com",
+            "dni" => "483902198",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario es de ejemplo"
+        ];
+
+        $response = $this->post('20/api/v1/user/new', $request);
+
+        $response->assertStatus(200);
+    }
+
     public function testCreateUserNotOK(){
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
