@@ -77,6 +77,7 @@ class EvidenceControllerTest extends TestCase
         $response->assertStatus(302);
     }
 
+    //Creamos una evidencia
     public function testCreateEvidenceOk()
     {
         \Artisan::call('passport:install');
@@ -173,7 +174,8 @@ class EvidenceControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function testRemoveEvidenceOk(){
+    //Intentamos borrar una evidencia que no es nuestra
+    public function testRemoveEvidenceNotOk(){
 
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
@@ -189,6 +191,24 @@ class EvidenceControllerTest extends TestCase
 
         $response->assertStatus(403);
 
+    }
+
+    //Intentamos volver a poner en modo borrador una evidencia que no es nuestra
+    public function testReeditEvidenceNotOk(){
+
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario9@secretario9.com',
+            'password' => Hash::make('secretario9')
+        ]);
+
+        $this->actingAs($user, 'api');
+
+        $response = $this->post('20/api/v1/evidence/reedit/1');
+
+        $response->assertStatus(403);
     }
 
 
