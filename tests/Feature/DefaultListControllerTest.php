@@ -130,5 +130,28 @@ class DefaultListControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function testDeleteDefaultListOk()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario2@secretario2.com',
+            'password' => Hash::make('secretario2')
+        ]);
+        $this->actingAs($user, 'api');
+
+        //See Below
+        //$token = $user->generateToken();
+
+        //$headers = [ 'Authorization' => 'Bearer ' +$token];
+
+        $response = $this->post('20/api/v1/secretary/defaultlist/remove/1');
+
+        $response->assertStatus(200);
+    }
+
+
 
 }
