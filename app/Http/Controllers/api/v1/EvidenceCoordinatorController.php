@@ -23,12 +23,18 @@ class EvidenceCoordinatorController extends Controller
     public function all($instance)
     {
         //$instance = \Instantiation::instance();
-
         $coordinator = auth('api')->user()->coordinator;
-        $comittee = $coordinator->comittee;
-        $evidences = $comittee->evidences_not_draft()->paginate(10);;
+        if($coordinator){
+            $comittee = $coordinator->comittee;
+            $evidences = $comittee->evidences_not_draft()->paginate(10);
 
-        return $evidences;
+            return $evidences;
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no es coordinador.'
+        ], 403);
     }
 
     public function pending()
@@ -36,10 +42,18 @@ class EvidenceCoordinatorController extends Controller
         //$instance = \Instantiation::instance();
 
         $coordinator = auth('api')->user()->coordinator;
-        $comittee = $coordinator->comittee;
-        $evidences = $comittee->evidences_pending()->paginate(10);
+        if($coordinator){
+            $comittee = $coordinator->comittee;
+            $evidences = $comittee->evidences_pending()->paginate(10);
 
-        return $evidences;
+            return $evidences;
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no es coordinador.'
+        ], 403);
+
     }
 
     public function accepted()
@@ -47,21 +61,36 @@ class EvidenceCoordinatorController extends Controller
         //$instance = \Instantiation::instance();
 
         $coordinator = auth('api')->user()->coordinator;
-        $comittee = $coordinator->comittee;
-        $evidences = $comittee->evidences_accepted()->paginate(10);
+        if($coordinator){
+            $comittee = $coordinator->comittee;
+            $evidences = $comittee->evidences_accepted()->paginate(10);
 
-        return $evidences;
+            return $evidences;
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no es coordinador.'
+        ], 403);
+
     }
 
     public function rejected()
     {
         //$instance = \Instantiation::instance();
-
         $coordinator = auth('api')->user()->coordinator;
-        $comittee = $coordinator->comittee;
-        $evidences = $comittee->evidences_rejected()->paginate(10);
 
-        return $evidences;
+        if($coordinator){
+            $comittee = $coordinator->comittee;
+            $evidences = $comittee->evidences_rejected()->paginate(10);
+
+            return $evidences;
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario no es coordinador.'
+        ], 403);
     }
 
     public function accept($instance,$id)
