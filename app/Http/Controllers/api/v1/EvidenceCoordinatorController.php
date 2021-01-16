@@ -13,7 +13,7 @@ class EvidenceCoordinatorController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('checkrolesapi:COORDINATOR|SECRETARY');
+        $this->middleware('checkrolesapi:PRESIDENT|COORDINATOR|REGISTER_COORDINATOR|SECRETARY|STUDENT');
     }
 
     /****************************************************************************
