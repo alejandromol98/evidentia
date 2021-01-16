@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
+use Test\Feature\Session;
 
 class InstanceTest extends TestCase
 {
@@ -12,11 +13,14 @@ class InstanceTest extends TestCase
      * A basic test example.
      *
      * @return void
-     */
+
 
     //use RefreshDatabase;
 
+
     public function testSettingUp() :void {
+        Session::start();
+
 
         DB::connection()->getPdo()->exec("DROP DATABASE IF EXISTS `homestead`;");
         DB::connection()->getPdo()->exec("DROP DATABASE IF EXISTS `basetest`;");

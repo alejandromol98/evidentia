@@ -16,7 +16,7 @@ class EvidenceControllerTest extends TestCase
     /**
      * Tests LIST USERS:
      * Para obtener una lista con los usuarios, es necesario estar logeado con algún usuario
-     */
+
 
     // Obtenemos la lista de evidencias, logueandonos como secretario
     public function testListEvidencesOk()
@@ -142,7 +142,7 @@ class EvidenceControllerTest extends TestCase
         $response = $this->post('20/api/v1/evidence/publish/edit/4',$request);
 
         $response->assertStatus(403);
-    }
+    } */
 
 
 }
