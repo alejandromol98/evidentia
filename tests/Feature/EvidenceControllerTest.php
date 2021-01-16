@@ -107,10 +107,33 @@ class EvidenceControllerTest extends TestCase
         $response->assertStatus(201);
     }
 
-    // Obtenemos la lista de evidencias, sin ninguna autenticación
+    //Intentamos crear una evidencia sin estar autenticados
     public function testCreateEvidenceNotOk()
     {
         $response = $this->post('20/api/v1/evidence/draft');
+
+        $response->assertStatus(302);
+    }
+
+    //Intentamos ver una evidencia que no pertenece al usuario logeado
+    public function testViewEvidenceNotOk(){
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario3@secretario3.com',
+            'password' => Hash::make('secretario3')
+        ]);
+        $this->actingAs($user, 'api');
+
+        $response = $this->get('20/api/v1/evidence/view/1');
+
+        $response->assertStatus(403);
+    }
+
+    //Intentamos ver una evidencia sin estar autenticado
+    public function testViewEvidenceNotOk2(){
+        $response = $this->get('20/api/v1/evidence/view/1');
 
         $response->assertStatus(302);
     }
@@ -174,6 +197,20 @@ class EvidenceControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    //Intentamos poner en modo publicada una evidencia sin habernos autenticado
+    public function testEditEvidenceNotOk3(){
+        $response = $this->post('20/api/v1/evidence/publish/edit/1');
+
+        $response->assertStatus(302);
+    }
+
+    //Intentamos poner en modo borrador una evidencia sin habernos autenticado
+    public function testEditEvidenceNotOk4(){
+        $response = $this->post('20/api/v1/evidence/draft/edit/1');
+
+        $response->assertStatus(302);
+    }
+
     //Intentamos borrar una evidencia que no es nuestra
     public function testRemoveEvidenceNotOk(){
 
@@ -190,8 +227,16 @@ class EvidenceControllerTest extends TestCase
         $response = $this->post('20/api/v1/evidence/remove/1');
 
         $response->assertStatus(403);
-
     }
+
+    //Intentamos borrar una evidencia sin estar autenticados
+    public function testRemoveEvidenceNotOk2(){
+
+        $response = $this->post('20/api/v1/evidence/remove/1');
+
+        $response->assertStatus(302);
+    }
+
 
     //Intentamos volver a poner en modo borrador una evidencia que no es nuestra
     public function testReeditEvidenceNotOk(){
@@ -209,6 +254,13 @@ class EvidenceControllerTest extends TestCase
         $response = $this->post('20/api/v1/evidence/reedit/1');
 
         $response->assertStatus(403);
+    }
+
+    //Intentamos volver a poner en modo borrados una evidencia sin estar autenticados
+    public function testReeditEvidenceNotOk2(){
+        $response = $this->post('20/api/v1/evidence/reedit/1');
+
+        $response->assertStatus(302);
     }
 
 
