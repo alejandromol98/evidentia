@@ -169,10 +169,10 @@ class UserController extends Controller
 
             $user->save();
         } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'El usuario seleccionado no existe.'
-                ],400);
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario seleccionado no existe.'
+            ],400);
         }
 
         return $user;

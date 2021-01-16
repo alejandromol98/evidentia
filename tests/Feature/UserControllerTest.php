@@ -12,8 +12,28 @@ use Laravel\Passport\Passport;
 use Tests\TestCase;
 use App\User;
 
+
 class UserControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
+
+    public function testSettingUp() :void {
+
+        DB::connection()->getPdo()->exec("DROP DATABASE IF EXISTS `homestead`;");
+        DB::connection()->getPdo()->exec("DROP DATABASE IF EXISTS `basetest`;");
+        DB::connection()->getPdo()->exec("CREATE DATABASE IF NOT EXISTS `homestead`");
+        DB::connection()->getPdo()->exec("ALTER SCHEMA `homestead`  DEFAULT CHARACTER SET utf8mb4  DEFAULT COLLATE utf8mb4_unicode_ci");
+        exec("php artisan migrate");
+        exec("php artisan db:seed");
+        exec('php artisan db:seed --class=InstancesTableSeeder');
+
+        $this->assertTrue(true);
+
+    }
+
+
+
 
     public function testSettingUp() :void {
 
@@ -102,6 +122,29 @@ class UserControllerTest extends TestCase
      * Test Create New User
      * Un usuario no podrá ser creado si ya existe otro con el mismo "username", "email" o "dni
      */
+
+
+    public function testCreateUserOK(){
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+
+        $request = [
+            "name" => "Miguel12",
+            "surname" => "Saavedra12",
+            "username" => "test123",
+            "password" => "test12356789",
+            "email" => "test@test.com",
+            "dni" => "483902198",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario es de ejemplo"
+        ];
+
+        $response = $this->post('20/api/v1/user/new', $request);
+
+        $response->assertStatus(200);
+    }
+
     public function testCreateUserNotOK(){
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
@@ -178,6 +221,28 @@ class UserControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    // Test Edit User 3: Se intenta editar a un usuario sin haberse logeado. Devuelve error 401 Unauthorized
+
+
+    public function testEditUserNotOKNotLogged2()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $request = [
+            "name" => "Ejemplo",
+            "surname" => "Ejemplo",
+            "password" => "coordinador1",
+            "email" => "coordinador1@coordinador1.com",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario se ha editado"
+        ];
+
+        $response = $this->post('20/api/v1/user/edit/5', $request);
+
+        $response->assertStatus(401);
+    }
+
     // Test Edit User 3: un usuario intenta editar su email y poner otro que ya existe. Devuelve error 401 Unauthorized
     public function testEditUserNotOKEmailNotUnique()
     {
@@ -225,5 +290,54 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    /*
+    * REMOVE USER: un usuario no puede borrar a otro usuario que no sea el
+    */
+
+    // Test Remove User: un usuario intenta eliminar una cuenta que no es la suya
+
+    public function testRemoveUserNotOK()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'test@test.com',
+            'password' => Hash::make('Miguel12')
+        ]);
+        $this->actingAs($user, 'api');
+
+
+        $response = $this->post('20/api/v1/user/remove/6');
+
+        $response->assertStatus(401);
+    }
+
+
+    // Test Remove User: Intentar eliminar usuarios sin haberse autentificado
+
+    public function testRemoveUserNotOk2()
+    {
+        $response = $this->post('20/api/v1/user/remove/6');
+
+        $response->assertStatus(401);
+    }
+    public function testLoginApiTrue()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $request = [
+            'email' => 'profesor1@profesor1.com',
+            'password' => 'profesor1'
+        ];
+
+        $response = $this->post('20/api/v1/login',$request);
+        $response->assertStatus(200);
+    }
+
+
+
 
 }
