@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 
 class EvidenceCoordinatorControllerTest extends TestCase
 {
+    /*
     //Nos logueamos como coordinador2
     public function testLoginCoordinatorTrue()
     {
@@ -181,4 +182,5 @@ class EvidenceCoordinatorControllerTest extends TestCase
         $response = $this->get('{instance}/api/v1/coordinator/evidence/reject/14');
         $response->assertStatus(403);
     }
+    */
 }
