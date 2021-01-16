@@ -88,7 +88,7 @@ class MeetingSecretaryController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'El usuario es secretario, no puede crear una reunion.'
+                'message' => 'El usuario no es secretario, no puede crear una reunion.'
             ], 403);
 
         }
@@ -169,7 +169,7 @@ class MeetingSecretaryController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'El usuario es secretario, no puede editar una reunion.'
+                'message' => 'El usuario no es secretario, no puede editar una reunion.'
             ], 403);
 
 
