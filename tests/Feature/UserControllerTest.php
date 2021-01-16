@@ -207,6 +207,27 @@ class UserControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    // Test Edit User 3: Se intenta editar a un usuario sin haberse logeado. Devuelve error 401 Unauthorized
+
+
+    public function testEditUserNotOKNotLogged2()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $request = [
+            "name" => "Ejemplo",
+            "surname" => "Ejemplo",
+            "password" => "coordinador1",
+            "email" => "coordinador1@coordinador1.com",
+            "participation" => "ASSISTANCE",
+            "biography" => "Este usuario se ha editado"
+        ];
+
+        $response = $this->post('20/api/v1/user/edit/5', $request);
+
+        $response->assertStatus(401);
+    }
 
     // Test Edit User 3: un usuario intenta editar su email y poner otro que ya existe. Devuelve error 401 Unauthorized
     public function testEditUserNotOKEmailNotUnique()
