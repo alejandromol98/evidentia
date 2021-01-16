@@ -15,6 +15,21 @@ use App\User;
 class UserControllerTest extends TestCase
 {
 
+    public function testSettingUp() :void {
+
+        DB::connection()->getPdo()->exec("DROP DATABASE IF EXISTS `homestead`;");
+        DB::connection()->getPdo()->exec("DROP DATABASE IF EXISTS `basetest`;");
+        DB::connection()->getPdo()->exec("CREATE DATABASE IF NOT EXISTS `homestead`");
+        DB::connection()->getPdo()->exec("ALTER SCHEMA `homestead`  DEFAULT CHARACTER SET utf8mb4  DEFAULT COLLATE utf8mb4_unicode_ci");
+        exec("php artisan migrate");
+        exec("php artisan db:seed");
+        exec('php artisan db:seed --class=InstancesTableSeeder');
+
+        $this->assertTrue(true);
+
+    }
+
+
 
     /**
      * Tests LIST USERS:
@@ -237,7 +252,7 @@ class UserControllerTest extends TestCase
     }
 
     /*
-    * DELETE USER: un usuario no puede borrar a otro usuario que no sea el
+    * REMOVE USER: un usuario no puede borrar a otro usuario que no sea el
     */
 
     // Test Remove User: un usuario intenta eliminar una cuenta que no es la suya
@@ -258,6 +273,17 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+
+    // Test Remove User: Intentar eliminar usuarios sin haberse autentificado
+
+    public function testRemoveUserNotOk2()
+    {
+        $response = $this->post('20/api/v1/user/remove/6');
+
+        $response->assertStatus(401);
+    }
+
 
 
 }
