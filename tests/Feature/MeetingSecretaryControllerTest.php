@@ -101,7 +101,34 @@ class MeetingSecretaryControllerTest extends TestCase
         $response->assertStatus(201);
     }
 
-    public function testCreateMeetingNotOk()
+    public function testCreateMeetingNoOk()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario4@secretario4.com',
+            'password' => Hash::make('secretario4')
+        ]);
+
+        $request = [
+            'tittle'  => 'Ejemplo de una reunion',
+            'hours' => 2,
+            'type' => 1,
+            'place' => '',
+            'date' => '20-12-21',
+            'time' => '10:30',
+            'users' => [3,4,5]
+
+        ];
+        $this->actingAs($user, 'api');
+
+        $response = $this->post('20/api/v1/secretary/meeting/new',$request);
+
+        $response->assertStatus(201);
+    }
+
+    public function testCreateMeetingNotOk2()
     {
         $response = $this->post('20/api/v1/secretary/meeting/new');
 
@@ -109,42 +136,14 @@ class MeetingSecretaryControllerTest extends TestCase
     }
 
 
-    public function testEditMeetingOk()
-    {
-        \Artisan::call('passport:install');
-        $this->withoutExceptionHandling();
-
-
-        $user = factory(User::class)->create([
-            'email' => 'secretario2@secretario2.com',
-            'password' => Hash::make('secretario2')
-        ]);
-
-        $request = [
-            'tittle'  => 'Ejemplo de una reunion editada',
-            'hours' => 2,
-            'type' => 1,
-            'place' => 'Ejemplo de lugar',
-            'date' => '20-12-21',
-            'time' => '10:30',
-            'users' => [3,4,5]
-        ];
-        $this->actingAs($user, 'api');
-
-        $response = $this->post('20/api/v1/secretary/meeting/edit/1',$request);
-
-        $response->assertStatus(201);
-    }
-
-
-    public function testEditMeetingNotOk()
+    public function testEditMeetingNotOk2()
     {
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
 
         $user = factory(User::class)->create([
-            'email' => 'secretario2@secretario2.com',
-            'password' => Hash::make('secretario2')
+            'email' => 'secretario8@secretario8.com',
+            'password' => Hash::make('secretario8')
         ]);
 
         $request = [
@@ -161,6 +160,33 @@ class MeetingSecretaryControllerTest extends TestCase
         $response = $this->post('20/api/v1/secretary/meeting/edit/6',$request);
 
         $response->assertStatus(403);
+    }
+
+    public function testRemoveMeetingNoOk(){
+
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+
+        $user = factory(User::class)->create([
+            'email' => 'secretario9@secretario9.com',
+            'password' => Hash::make('secretario9')
+        ]);
+
+        $this->actingAs($user, 'api');
+
+        $response = $this->post('20/api/v1/secretary/meeting/remove/1');
+
+        $response->assertStatus(403);
+
+    }
+
+    public function testRemoveMeetingNoOk2(){
+
+        $response = $this->post('20/api/v1/secretary/meeting/remove/1');
+
+        $response->assertStatus(302);
+
     }
 
 
