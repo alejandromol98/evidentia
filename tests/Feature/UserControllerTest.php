@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Faker\Generator as Faker;
 use Laravel\Passport\Passport;
@@ -13,6 +14,7 @@ use App\User;
 
 class UserControllerTest extends TestCase
 {
+
 
     /**
      * Tests LIST USERS:
@@ -89,7 +91,7 @@ class UserControllerTest extends TestCase
      */
 
 
-    public function testCreateUserOK(){
+  /**  public function testCreateUserOK(){
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();
 
@@ -108,7 +110,7 @@ class UserControllerTest extends TestCase
         $response = $this->post('20/api/v1/user/new', $request);
 
         $response->assertStatus(200);
-    }
+    }*/
 
     public function testCreateUserNotOK(){
         \Artisan::call('passport:install');
@@ -233,5 +235,29 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    /*
+    * DELETE USER: un usuario no puede borrar a otro usuario que no sea el
+    */
+
+    // Test Remove User: un usuario intenta eliminar una cuenta que no es la suya
+
+    public function testRemoveUserNotOK()
+    {
+        \Artisan::call('passport:install');
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create([
+            'email' => 'test@test.com',
+            'password' => Hash::make('Miguel12')
+        ]);
+        $this->actingAs($user, 'api');
+
+
+        $response = $this->post('20/api/v1/user/remove/6');
+
+        $response->assertStatus(401);
+    }
+
 
 }
