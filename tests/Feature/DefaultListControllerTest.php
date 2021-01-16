@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tests\Feature;
+/* namespace Tests\Feature;
 
 
 use Tests\TestCase;
@@ -154,4 +154,4 @@ class DefaultListControllerTest extends TestCase
 
 
 
-}
+} */
