@@ -86,6 +86,19 @@ Route::group(['prefix' => '{instance}/api/v1/secretary'], function(){
 });
 
 /**
+ *    DEFAULT LISTS SECRETARY
+ */
+
+Route::group(['prefix' => '{instance}/api/v1/secretary'], function(){
+    Route::middleware('auth:api')->get('/defaultlist/list', 'api\v1\DefaultListSecretaryController@list')->name('secretary.defaultlist.list');
+    Route::middleware('auth:api')->post('/defaultlist/new', 'api\v1\DefaultListSecretaryController@new')->name('secretary.defaultlist.new');
+    Route::middleware('auth:api')->post('/defaultlist/edit/{id}', 'api\v1\DefaultListSecretaryController@save')->name('secretary.defaultlist.save');
+    Route::middleware('auth:api')->post('/defaultlist/remove/{id}', 'api\v1\DefaultListSecretaryController@remove')->name('secretary.defaultlist.remove');
+
+
+});
+
+/**
  *  BONUS
  */
 Route::prefix('{instance}/api/v1')->group(function() {
