@@ -13,7 +13,7 @@ class MeetingSecretaryController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        //$this->middleware('auth');
 
         //Modificado para mostrar error en la API
         $this->middleware('checkrolesapi:PRESIDENT|COORDINATOR|REGISTER_COORDINATOR|SECRETARY|STUDENT');
@@ -24,7 +24,9 @@ class MeetingSecretaryController extends Controller
         if(auth('api')->user()->secretary) {
 
         $meetings = auth('api')->user()->secretary->comittee->meetings()->get();
+
         return $meetings;
+
         } else {
 
             return response()->json([

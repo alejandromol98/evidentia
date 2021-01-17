@@ -20,12 +20,12 @@ use Illuminate\Http\Response;
 
 class EvidenceController extends Controller
 {
-    /*public function __construct()
+    public function __construct()
     {
-        //$this->middleware('auth'); Esto es para usuarios logueados con el sistema de forma normal (email, password)
-        $this->middleware('checkrolesapi:PRESIDENT|COORDINATOR|REGISTER_COORDINATOR|SECRETARY|STUDENT');
+        //middleware('auth:api');
+        //$this->middleware('checkrolesapi:PRESIDENT|COORDINATOR|REGISTER_COORDINATOR|SECRETARY|STUDENT');
     }
-    */
+
 
     public function view($instance,$id)
     {
@@ -227,12 +227,27 @@ class EvidenceController extends Controller
 
     public function draft_edit(Request $request,$instance,$id)
     {
-        return $this->save($request,"DRAFT",$id);
+        if(auth('api')->id() == $id){
+            return $this->save($request,"DRAFT",$id);
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ], 403);
+        }
+
     }
 
     public function publish_edit(Request $request,$instance,$id)
     {
-        return $this->save($request,"PENDING",$id);
+        if(auth('api')->id() == $id){
+            return $this->save($request,"PENDING",$id);
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene permisos.'
+            ], 403);
+        }
     }
 
 
