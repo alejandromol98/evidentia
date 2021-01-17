@@ -13,7 +13,7 @@ class MeetingController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('checkroles:PRESIDENT|COORDINATOR|REGISTER_COORDINATOR|SECRETARY|STUDENT');
+        $this->middleware('checkrolesapi:PRESIDENT|COORDINATOR|REGISTER_COORDINATOR|SECRETARY|STUDENT');
     }
 
     public function list()
