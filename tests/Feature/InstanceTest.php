@@ -99,12 +99,10 @@ class InstanceTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $this->testAdminLoginTrue();
-
         $request = [
             'name' => 'Nuevo curso',
             'id' => 2
         ];
-
         $response = $this->post('admin/instance/manage/remove',$request);
         $response->assertStatus(302);
     }*/
