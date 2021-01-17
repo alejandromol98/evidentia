@@ -14,9 +14,8 @@ use App\Meeting;
 
 class MeetingControllerTest extends TestCase
 {
+
     /*
-
-
 
     //CLASE COMENTADA POR PROBLEMAS DE BASE DE DATOS AL EJECUTAR LOS TESTS
 
@@ -62,6 +61,5 @@ class MeetingControllerTest extends TestCase
 
         $response->assertStatus(302);
     }
-
     */
 }
