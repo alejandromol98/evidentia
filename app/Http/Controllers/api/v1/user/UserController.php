@@ -89,7 +89,7 @@ class UserController extends Controller
 
             $user->save();
 
-            return $user->toJson();
+            return $user;
         }
 
 

@@ -43,8 +43,6 @@ Route::group(['prefix' => '{instance}/api/v1'], function(){
     Route::middleware('auth:api')->post('/evidence/reedit/{id}', 'api\v1\EvidenceController@reedit')->name('evidence.reedit');
 });
 
-
-
 /**
  *  EVIDENCES COORDINATOR
  */
@@ -56,10 +54,7 @@ Route::group(['prefix' => '{instance}/api/v1/coordinator'], function(){
     Route::middleware('auth:api')->post('/evidenceCoordinator/accept/{id}', 'api\v1\EvidenceCoordinatorController@accept')->name('evidence.coordinator.accept');
     Route::middleware('auth:api')->post('/evidenceCoordinator/reject/{id}', 'api\v1\EvidenceCoordinatorController@reject')->name('evidence.coordinator.reject');
 
-
-
 });
-
 
 /**
  *    MEETINGS
@@ -73,7 +68,6 @@ Route::group(['prefix' => '{instance}/api/v1'], function(){
 /**
  *    MEETINGS SECRETARY
  */
-
 
 Route::group(['prefix' => '{instance}/api/v1/secretary'], function(){
     Route::middleware('auth:api')->get('/meeting/list', 'api\v1\MeetingSecretaryController@list')->name('meeting.list');
@@ -102,12 +96,12 @@ Route::group(['prefix' => '{instance}/api/v1/secretary'], function(){
  *  BONUS
  */
 Route::prefix('{instance}/api/v1')->group(function() {
-    Route::get('/bonus/list', 'api\v1\BonusController@list')->name('bonus.list');
+    Route::middleware('auth:api')->get('/bonus/list', 'api\v1\BonusController@list')->name('bonus.list');
 
     Route::middleware(['checkregisterbonus', 'auth:api'])->group(function () {
-        Route::post('/bonus/new', 'api\v1\BonusController@new')->name('bonus.new');
+        Route::middleware('auth:api')->post('/bonus/new', 'api\v1\BonusController@new')->name('bonus.new');
     });
-    Route::post('/bonus/edit/{id}', 'api\v1\BonusController@edit')->name('bonus.edit');
-    Route::post('/bonus/remove/{id}', 'api\v1\BonusController@remove')->name('bonus.remove');
+    Route::middleware('auth:api')->post('/bonus/edit/{id}', 'api\v1\BonusController@edit')->name('bonus.edit');
+    Route::middleware('auth:api')->post('/bonus/remove/{id}', 'api\v1\BonusController@remove')->name('bonus.remove');
 
 });

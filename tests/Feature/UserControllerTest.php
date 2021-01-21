@@ -130,7 +130,8 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(200);
     }
-*/
+
+
     public function testCreateUserNotOK(){
         \Artisan::call('passport:install');
         $this->withoutExceptionHandling();

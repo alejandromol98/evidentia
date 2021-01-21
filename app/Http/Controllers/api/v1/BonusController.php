@@ -16,14 +16,13 @@ class BonusController extends Controller
         $this->middleware('checkrolesapi:SECRETARY');
     }
 
-    public function list($instance)
+    public function list($instance,$id)
     {
         $secretary = auth('api')->user()->secretary;
         $comittee = $secretary->comittee;
         $bonus = $comittee->bonus()->get();
-
-
         return $bonus;
+
     }
 
     public function new(Request $request)
@@ -77,7 +76,7 @@ class BonusController extends Controller
 
         }
 
-        return $bonus->toJson();
+        return $bonus;
         }
     }
 
