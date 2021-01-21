@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('{instance}/api/v1')->group(function(){
     Route::post('/login', 'api\v1\LoginController@login');
-    Route::middleware('auth:api')->get('user/all','api\v1\user\UserController@index');
+    Route::get('user/all','api\v1\user\UserController@index');
     Route::get('/user/view/{id}','api\v1\user\UserController@view');
     Route::post('/user/new', 'api\v1\user\UserController@new')->name('user.new');
     Route::post('/user/edit/{id}', 'api\v1\user\UserController@edit')->name('user.edit');
